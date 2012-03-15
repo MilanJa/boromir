@@ -184,14 +184,14 @@ $("#start").click(function() {
 
   function makeOrc() {
     var orc = Combat.Creature({
-      name: "orc",
+      name: "yeti",
       gender: "male",
       isUnique: false,
-      level: 4*parseInt(stats[5]),
-      str: 15*parseInt(stats[5]),
-      dex: 12*parseInt(stats[5]),
-      con: 13*parseInt(stats[5]),
-      hp: 30*parseInt(stats[5]),
+      level: 4*parseFloat(stats[5]),
+      str: 15*parseFloat(stats[5]),
+      dex: 12*parseFloat(stats[5]),
+      con: 13*parseFloat(stats[5]),
+      hp: 30*parseFloat(stats[5]),
       parts: Boromir.WORDS.humanoidParts,
       stumbles: Boromir.WORDS.stumbles
     });
