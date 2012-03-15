@@ -4,78 +4,69 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Boromir Death Simulator</title>
-<style>
-body {
-  position: relative;
-  background: #111111;
-  color: #f0f0f0;
-  font-family: Monaco, "Lucida Console", Futura, monospace;
-  font-size: small;
-  overflow: hidden;
-  -moz-transition: top 0.25s;
-  -webkit-transition: top 0.25s;
-  -o-transition: top 0.25s;
-}
-
-p {
-  margin-top: 0.25em;
-  margin-bottom: 0.25em;  
-}
-
-p.combat {
-  opacity: 0.0;
-  -moz-transition: opacity 0.25s;
-  -webkit-transition: opacity 0.25s;
-  -o-transition: opacity 0.25s;
-}
-
-p.combat.transition {
-  opacity: 1.0;
-}
-
-p.combat.status + p.combat.hero,
-p.combat.status + p.combat.villain,
-p.combat.hero + p.combat.villain,
-p.combat.villain + p.combat.hero {
-  padding-top: 1em;
-}
-
-p.combat.status {
-  padding-top: 1em;
-  white-space: pre;
-  color: gray;
-}
-
-p.combat.status:before {
-  content: '(';
-}
-
-p.combat.status:after {
-  content: ')';
-}
-
-p.combat.hit, p.combat.miss, p.combat.stumble {
-  padding-left: 2em;
-}
-
-p.combat.death {
-  padding-bottom: 1em;
-}
-
-p.combat.stumble {
-  font-style: italic;
-}
-
-a {
-  color: inherit;
-}
-</style>
+<link rel="stylesheet" href="boromir.css" type="text/css" />
 <p><a target="_blank" href="https://github.com/toolness/boromir#readme">Boromir Death Simulator</a></p>
-<p>Version 0.1</p>
+<p>Custom version 0.1</p>
 <p>&nbsp;</p>
-<script src="grammar.js"></script>
-<script src="combat.js"></script>
-<script src="boromir.js"></script>
+<form id="setup">
+<h3>Boromir:</h3>
+<p>
+  <label>is at level:
+    <input type="text" id="level" placeholder="15" value="15">
+  </label>
+</p>
+<p>
+  <label>
+    Strength: <input type="text" id="str" placeholder="17" value="17">
+  </label>
+  <label>
+    Dexterity: <input type="text" id="dex" placeholder="17" value="17">
+  </label>
+    <label>
+    Constitution: <input type="text" id="con" placeholder="13" value="13">
+  </label>
+  <label>
+    HP: <input type="text" id="hp" placeholder="104" value="104">
+  </label>
+</p>
+<p>
+  <label>Wielding a:
+    <select id="weapon">
+      <option>longsword</option>
+      <option>mace and chain</option>
+      <option>warhammer</option>
+      <option>greatsword</option>
+      <option>dagger</option>
+      <option>battleaxe</option>
+    </select>
+  </label>
+</p>
+<p>
+<label>Wearing:
+  <select id="armor">
+    <option>chain shirt</option>
+    <option>cloth</option>
+    <option>padded</option>
+    <option>leather</option>
+    <option>chainmail</option>
+    <option>splint mail</option>
+    <option>half plate</option>
+    <option>full plate</option>
+  </select>
+</label>
+</p>
+<p>
+<label>Difficulty multiplier:
+<input type="text" id="multiplier" placeholder="1" value="1">
+</label>
+</p>
+<button type="button" class="btn btn-inverse" id="start">Start</button>
+</form>
+<div id="console">
+<script src="jquery.js" type="text/javascript"></script>
+<script src="grammar.js" type="text/javascript"></script>
+<script src="combat.js" type="text/javascript"></script>
+<script src="boromir.js" type="text/javascript"></script>
 <script>
 function scrollToBottom() {
   var ODD_EXTRA_SPACE = 16;
@@ -93,21 +84,30 @@ onresize = scrollToBottom;
 // Prevent touch-based scrolling.
 ontouchstart = function(event) { event.preventDefault(); };
 
+
+
 function Output(hero) {
   var queue = [];
-
+  var killcount = 0;
   function showMessage(message) {
+    var consolediv = document.getElementById("console");
     var p = document.createElement("p");
-    var baseClass = "combat " + message.category;
     
+    var baseClass = "combat " + message.category;
+    if (message.category=="death" && message.text!="Boromir has been killed!") {
+        killcount++;
+        document.getElementById("count").textContent = killcount;
+    }
+
     if (message.attacker)
       baseClass += " " + message.attacker;
     p.setAttribute("class", baseClass);
-    p.appendChild(document.createTextNode(message.text));
-    document.body.appendChild(p);
+    
+    consolediv.appendChild(p);
     setTimeout(function() {
       p.setAttribute("class", baseClass + " transition");
     }, 1);
+    p.appendChild(document.createTextNode(message.text));
     scrollToBottom();
   }
   
@@ -150,33 +150,48 @@ function Output(hero) {
   return self;
 }
 
-onload = function() {
-  var boromir = Combat.Creature({
+$("#start").click(function() {
+  //gui effects
+
+  $("#setup").slideUp();
+  $("#counter").fadeIn();
+  //read in stats
+
+    var stats = [ $("#level").val(),
+                  $("#str").val(),
+                  $("#dex").val(),
+                  $("#con").val(),
+                  $("#hp").val(),
+                  $("#multiplier").val()];
+    
+    var boromir = Combat.Creature({
     name: "Boromir",
     gender: "male",
     isUnique: true,
-    level: 15,
-    str: 17,
-    dex: 17,
-    con: 13,
-    hp: 104,
+    level: parseInt(stats[0],10),
+    str:   parseInt(stats[1],10),
+    dex:   parseInt(stats[2],10),
+    con:   parseInt(stats[3],10),
+    hp:    parseInt(stats[4],10),
     parts: Boromir.WORDS.humanoidParts,
     stumbles: Boromir.WORDS.stumbles
   });
 
-  boromir.equipWeapon(Boromir.utils.makeWeapon("longsword"));
-  boromir.equipArmor(Boromir.utils.makeArmor("chain shirt"));
+    console.log($("#weapon").val());
+    console.log($("#armor").val());
+  boromir.equipWeapon(Boromir.utils.makeWeapon($("#weapon").val()));
+  boromir.equipArmor(Boromir.utils.makeArmor($("#armor").val()));
 
   function makeOrc() {
     var orc = Combat.Creature({
       name: "orc",
       gender: "male",
       isUnique: false,
-      level: 4,
-      str: 15,
-      dex: 12,
-      con: 13,
-      hp: 30,
+      level: 4*parseInt(stats[5]),
+      str: 15*parseInt(stats[5]),
+      dex: 12*parseInt(stats[5]),
+      con: 13*parseInt(stats[5]),
+      hp: 30*parseInt(stats[5]),
       parts: Boromir.WORDS.humanoidParts,
       stumbles: Boromir.WORDS.stumbles
     });
@@ -192,6 +207,7 @@ onload = function() {
   var attack = Combat.MeleeAttack(narrator);
 
   function combat(p1, p2) {
+    
     var m = [[p1, p2], [p2, p1]];
     if (p2.check('dex') >= p1.check('dex'))
       m.reverse();
@@ -205,6 +221,7 @@ onload = function() {
              " HP";
     }
 
+    
     while (1) {
       output.emit("status", statusStr(p2) + "  " + statusStr(p1));
       for (var i = 0; i < m.length; i++) {
@@ -214,6 +231,8 @@ onload = function() {
           attack.executeTurn(attacker, defender);
         if (defender.hp == 0) {
           output.emit("death", defender.definiteName + " has been killed!");
+
+          output.pause(3);
           return;
         }
         output.pause(3);
@@ -226,13 +245,14 @@ onload = function() {
     output.emit("intro", orc.indefiniteName + " wielding " +
                 orc.weapon.indefiniteName + " approaches!");
     combat(orc, boromir);
-    output.pause(3);
   }
 
   output.emit("conclusion", "After killing " + (count-1) + " " +
               orc.name + "s, " + boromir.name + " died.");
 
   output.playback();
-};
+});
 </script>
+</div>
+<p id="counter">Kill count: <span id="count">0</span></p>
 </html>
