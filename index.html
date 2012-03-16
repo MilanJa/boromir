@@ -179,7 +179,7 @@ $("#start").click(function() {
     
     var boromir = Combat.Creature({
     name: "Boromir",
-    gender: "male",
+    gender: $("#sex").val(),
     isUnique: true,
     level: parseInt(stats[0],10),
     str:   parseInt(stats[1],10),
@@ -198,7 +198,7 @@ $("#start").click(function() {
   function makeOrc() {
     var orc = Combat.Creature({
       name: $("#enemy").val(),
-      gender: $("#sex").val(),
+      gender: "male",
       isUnique: false,
       level: 4*parseFloat(stats[5]),
       str: 15*parseFloat(stats[5]),
