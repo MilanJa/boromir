@@ -165,7 +165,10 @@ var Combat = (function(Grammar) {
         return 10 + self.armor.armorBonus + self.mod('dex');
       },
       baseAttackBonus: function() {
-        return ATTACKS_PER_ROUND[self.level - 1];
+        if(ATTACKS_PER_ROUND[self.level - 1])
+          return ATTACKS_PER_ROUND[self.level - 1];
+        else
+          return ATTACKS_PER_ROUND[19];
       },
       mod: function(name) {
         if (name.length != 3 || !(name in self))

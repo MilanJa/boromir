@@ -11,6 +11,14 @@
 <form id="setup">
 <h3>Boromir:</h3>
 <p>
+  <label>is a:
+    <select id="sex">
+      <option>male</option>
+      <option>female</option>
+    </select>
+  </label>
+</p>
+<p>
   <label>is at level:
     <input type="text" id="level" placeholder="15" value="15">
   </label>
@@ -54,6 +62,11 @@
     <option>full plate</option>
   </select>
 </label>
+</p>
+<p>
+  <label>Fight against:
+    <input type="text" id="enemy" placeholder="orc" value="orc" style="width: 10em">
+  </label>
 </p>
 <p>
 <label>Difficulty multiplier:
@@ -184,8 +197,8 @@ $("#start").click(function() {
 
   function makeOrc() {
     var orc = Combat.Creature({
-      name: "yeti",
-      gender: "male",
+      name: $("#enemy").val(),
+      gender: $("#sex").val(),
       isUnique: false,
       level: 4*parseFloat(stats[5]),
       str: 15*parseFloat(stats[5]),
